@@ -5,6 +5,7 @@
 	import { ScrollArea } from './components/ui/scroll-area';
 	import { Input } from './components/ui/input';
 	import { Button } from './components/ui/button';
+	import * as Avatar from '$lib/components/ui/avatar/index.js';
 
 	let newMessage: string = '';
 	let messages: RecordModel[] = [];
@@ -41,27 +42,16 @@
 		scrollToBottom();
 	}
 
-	function scrollToBottom() {
-		const messagesContainer = document.getElementById('messages-container');
-		// messagesContainer?.scrollTo({
-		// 	top: messagesContainer.scrollHeight,
-		// 	behavior: 'smooth'
-		// });
-		if (messagesContainer) {
-			messagesContainer.scrollTop = messagesContainer.scrollHeight;
-		}
-		// messagesContainer?.lastElementChild?.scrollIntoView({ behavior: 'smooth' });
-	}
+	function scrollToBottom() {}
 </script>
 
-<ScrollArea
-	id="messages-container"
-	class="fixed right-0 top-0 m-4 h-full w-[20%] rounded-md border p-4"
-	on:scoll={scrollToBottom}
->
+<ScrollArea class="fixed right-0 top-0 m-4 h-full w-[20%] rounded-md border p-4">
 	{#each messages as message (message.id)}
 		<div class="mb-4 flex items-start">
-			<!-- <img src={message.expand?.user?.avatar} alt="avatar" class="mr-2 rounded-full w-8 h-8" /> -->
+			<Avatar.Root class="mr-2 h-9 w-9">
+				<Avatar.Image src={message.expand?.user?.avatar} alt="@{message.expand?.user?.name}" />
+				<Avatar.Fallback>{message.expand?.user?.name[0]}</Avatar.Fallback>
+			</Avatar.Root>
 			<div>
 				<small>@{message.expand?.user?.name}</small>
 				<p>{message.text}</p>
