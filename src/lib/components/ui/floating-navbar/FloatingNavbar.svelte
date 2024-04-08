@@ -19,10 +19,7 @@
 	$: $scrollYProgress, updateDirection();
 
 	function updateDirection() {
-		console.log($scrollYProgress);
-
 		let direction = $scrollYProgress - scrollYProgress.getPrevious();
-		console.log(direction);
 
 		// if (scrollYProgress.get() < 0) {
 		// 	visible = false;
@@ -39,17 +36,9 @@
 <AnimatePresence show={true}>
 	<Motion
 		let:motion
-		initial={{
-			opacity: 1,
-			y: -100
-		}}
-		animate={{
-			y: visible ? 0 : -100,
-			opacity: visible ? 1 : 0
-		}}
-		transition={{
-			duration: 0.2
-		}}
+		initial={{ opacity: 1, y: -100 }}
+		animate={{ y: visible ? 0 : -100, opacity: visible ? 1 : 0 }}
+		transition={{ duration: 0.2 }}
 	>
 		<div
 			use:motion
@@ -69,9 +58,9 @@
 						this={navItem.icon}
 						class="block h-4 w-4 text-neutral-500 dark:text-white sm:hidden"
 					/>
-					<span class="block h-4 w-4 text-neutral-500 dark:text-white sm:hidden"
-						>{navItem.icon}</span
-					>
+					<span class="block h-4 w-4 text-neutral-500 dark:text-white sm:hidden">
+						{navItem.icon}
+					</span>
 					<span class="hidden text-sm sm:block">{navItem.name}</span>
 				</a>
 			{/each}
