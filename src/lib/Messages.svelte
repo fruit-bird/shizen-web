@@ -2,9 +2,9 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { currentUser, pb } from './pocketbase';
 	import type { RecordModel, UnsubscribeFunc } from 'pocketbase';
-	import { ScrollArea } from './components/ui/scroll-area';
-	import { Input } from './components/ui/input';
-	import { Button } from './components/ui/button';
+	import { ScrollArea } from '$lib/components/ui/scroll-area';
+	import { Input } from '$lib/components/ui/input';
+	import { Button } from '$lib/components/ui/button';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 
 	let newMessage: string = '';
@@ -13,10 +13,10 @@
 
 	onMount(async () => {
 		const resultList = await pb.collection('messages').getList(1, 50, {
-			sort: 'created',
+			sort: '-created',
 			expand: 'user'
 		});
-		messages = resultList.items;
+		messages = resultList.items.reverse();
 
 		// This is a subscription to realtime messages
 		unsubscribe = await pb.collection('messages').subscribe('*', async ({ action, record }) => {
@@ -49,7 +49,7 @@
 	{#each messages as message (message.id)}
 		<div class="mb-4 flex items-start">
 			<Avatar.Root class="mr-2 h-9 w-9">
-				<Avatar.Image src={message.expand?.user?.avatar} alt="@{message.expand?.user?.name}" />
+				<!-- <Avatar.Image src={message.expand?.user?.avatar} alt="@{message.expand?.user?.name}" /> -->
 				<Avatar.Fallback>{message.expand?.user?.name[0]}</Avatar.Fallback>
 			</Avatar.Root>
 			<div>
