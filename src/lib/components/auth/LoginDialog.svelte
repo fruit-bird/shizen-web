@@ -4,6 +4,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Label } from '$lib/components/ui/label';
+	import SignUpDialog from '$lib/components/auth/SignUpDialog.svelte';
 
 	let email: string = '';
 	let password: string = '';
@@ -20,33 +21,33 @@
 			<Dialog.Title>Login</Dialog.Title>
 			<Dialog.Description>Welcome back! Please login to continue.</Dialog.Description>
 		</Dialog.Header>
-		<div class="grid gap-4 py-4">
-			<div class="grid grid-cols-4 items-center gap-4">
-				<Label for="name" class="text-right">Email</Label>
-				<Input
-					id="name"
-					placeholder="fruit.bird@shizen.com"
-					type="email"
-					class="col-span-3"
-					bind:value={email}
-				/>
+		<form>
+			<div class="grid gap-4 py-4">
+				<div class="grid grid-cols-4 items-center gap-4">
+					<Label for="name" class="text-right">Email</Label>
+					<Input
+						id="name"
+						placeholder="fruit.bird@shizen.com"
+						type="email"
+						class="col-span-3"
+						bind:value={email}
+					/>
+				</div>
+				<div class="grid grid-cols-4 items-center gap-4">
+					<Label for="username" class="text-right">Password</Label>
+					<Input
+						id="username"
+						placeholder="••••••••"
+						type="password"
+						class="col-span-3"
+						bind:value={password}
+					/>
+				</div>
 			</div>
-			<div class="grid grid-cols-4 items-center gap-4">
-				<Label for="username" class="text-right">Password</Label>
-				<Input
-					id="username"
-					placeholder="••••••••"
-					type="password"
-					class="col-span-3"
-					bind:value={password}
-				/>
-			</div>
-		</div>
-		<Dialog.Footer>
-			<Dialog.Trigger class={buttonVariants({ variant: 'link', size: 'sm' })}>
-				Don't have an account?
-			</Dialog.Trigger>
-			<Button type="submit" on:click={login}>Login</Button>
-		</Dialog.Footer>
+			<Dialog.Footer>
+				<Button type="button" variant="link" size="sm">Already have an account?</Button>
+				<Button type="submit" on:click={login}>Login</Button>
+			</Dialog.Footer>
+		</form>
 	</Dialog.Content>
 </Dialog.Root>
