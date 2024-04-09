@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { currentUser, pb } from './pocketbase';
+	import { currentUser, pb } from '$lib/pocketbase';
 	import type { RecordModel, UnsubscribeFunc } from 'pocketbase';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import { Input } from '$lib/components/ui/input';
