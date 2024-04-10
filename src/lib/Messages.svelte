@@ -49,11 +49,13 @@
 	{#each messages as message (message.id)}
 		<div class="mb-4 flex items-start">
 			<Avatar.Root class="mr-2 h-9 w-9">
-				<!-- <Avatar.Image src={message.expand?.user?.avatar} alt="@{message.expand?.user?.name}" /> -->
-				<Avatar.Fallback>{message.expand?.user?.name[0]}</Avatar.Fallback>
+				<Avatar.Image src={message.expand?.user?.avatar} alt="{message.expand?.user?.username}" />
+				<Avatar.Fallback>{message.expand?.user?.display_name[0]}</Avatar.Fallback>
 			</Avatar.Root>
 			<div>
-				<small>@{message.expand?.user?.name}</small>
+				<a href="/user/{message.expand?.user?.username}">
+					<small>{message.expand?.user?.username}</small>
+				</a>
 				<p>{message.text}</p>
 			</div>
 		</div>
