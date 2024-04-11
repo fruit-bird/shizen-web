@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { pb } from '$lib/pocketbase';
+	import { currentUser, pb } from '$lib/pocketbase';
 	import type { RecordModel } from 'pocketbase';
 	import { page } from '$app/stores';
 
@@ -8,6 +8,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
+	import * as Avatar from '$lib/components/ui/avatar';
 	import SongCard from '$lib/components/SongCard.svelte';
 
 	let user: RecordModel;
@@ -26,6 +27,19 @@
 	});
 </script>
 
+<div class="flex items-center m-4">
+    <div class="flex-none mr-4">
+        <Avatar.Root class="h-24 w-24">
+            <Avatar.Image src={user?.avatar} alt={user?.username} />
+            <Avatar.Fallback>{user?.display_name[0]}</Avatar.Fallback>
+        </Avatar.Root>
+    </div>
+    <div>
+        <h1 class="text-3xl font-semibold">{user?.display_name}</h1>
+        <p class="text-muted-foreground">{user?.bio}</p>
+    </div>
+</div>
+
 <div class="hidden md:block">
 	<div class="border-t">
 		<div class="bg-background">
@@ -41,11 +55,17 @@
 											Most recent uploads for your enjoyment
 										</p>
 									</div>
-									<div class="space-between flex items-center">
-										<div class="ml-auto mr-4">
-											<Button><PlusCircled class="mr-2 h-4 w-4" /> Add music</Button>
-										</div>
-									</div>
+									{#if user?.id === $currentUser?.id}
+										<Button
+											href="/upload"
+											color="primary"
+											size="sm"
+											class="space-between flex items-center"
+										>
+											<PlusCircled class="h-4 w-4" />
+											<span class="ml-2">Upload Music</span>
+										</Button>
+									{/if}
 								</div>
 								<Separator class="my-4" />
 								<div class="relative">
