@@ -36,7 +36,7 @@
     </div>
     <div>
         <h1 class="text-3xl font-semibold">{user?.display_name}</h1>
-        <p class="text-muted-foreground">{user?.bio}</p>
+        <p class="text-muted-foreground">{user?.tag_line}</p>
     </div>
 </div>
 
