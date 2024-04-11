@@ -6,11 +6,11 @@
 	import { Label } from '$lib/components/ui/label';
 	import SignUpDialog from '$lib/components/auth/SignUpDialog.svelte';
 
-	let email: string = '';
+	let username: string = '';
 	let password: string = '';
 
 	async function login() {
-		await pb.collection('users').authWithPassword(email, password);
+		await pb.collection('users').authWithPassword(username, password);
 	}
 </script>
 
@@ -24,13 +24,13 @@
 		<form>
 			<div class="grid gap-4 py-4">
 				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="name" class="text-right">Email</Label>
+					<Label for="name" class="text-right">Username</Label>
 					<Input
 						id="name"
-						placeholder="fruit.bird@shizen.com"
-						type="email"
+						placeholder="fruit.bird"
+						type="text"
 						class="col-span-3"
-						bind:value={email}
+						bind:value={username}
 					/>
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
