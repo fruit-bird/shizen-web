@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils.js';
 	import type { RecordModel } from 'pocketbase';
+	import { pb } from '$lib/pocketbase';
 
 	let className: string | undefined | null = 'w-[250px]';
 	export let aspectRatio: 'portrait' | 'square' = 'square';
@@ -19,7 +20,7 @@
 				'h-auto w-auto object-cover transition-all hover:scale-105',
 				aspectRatio === 'portrait' ? 'aspect-[3/4]' : 'aspect-square'
 			)}
-			src={song.cover_art}
+			src={pb.files.getUrl(song, song?.cover_art)}
 			alt={song.title}
 			{width}
 			{height}

@@ -27,17 +27,17 @@
 	});
 </script>
 
-<div class="flex items-center m-4">
-    <div class="flex-none mr-4">
-        <Avatar.Root class="h-24 w-24">
-            <Avatar.Image src={user?.avatar} alt={user?.username} />
-            <Avatar.Fallback>{user?.display_name[0]}</Avatar.Fallback>
-        </Avatar.Root>
-    </div>
-    <div>
-        <h1 class="text-3xl font-semibold">{user?.display_name}</h1>
-        <p class="text-muted-foreground">{user?.tag_line}</p>
-    </div>
+<div class="m-4 flex items-center">
+	<div class="mr-4 flex-none">
+		<Avatar.Root class="h-24 w-24">
+			<Avatar.Image src={pb.files.getUrl(user, user?.avatar)} alt={user?.username} />
+			<Avatar.Fallback>{user?.display_name[0]}</Avatar.Fallback>
+		</Avatar.Root>
+	</div>
+	<div>
+		<h1 class="text-3xl font-semibold">{user?.display_name}</h1>
+		<p class="text-muted-foreground">{user?.tag_line}</p>
+	</div>
 </div>
 
 <div class="hidden md:block">
