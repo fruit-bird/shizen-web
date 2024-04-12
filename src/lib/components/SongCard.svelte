@@ -15,20 +15,24 @@
 
 <div class={cn('space-y-3', className)} {...$$restProps}>
 	<div class="overflow-hidden rounded-md">
-		<img
-			class={cn(
-				'h-auto w-auto object-cover transition-all hover:scale-105',
-				aspectRatio === 'portrait' ? 'aspect-[3/4]' : 'aspect-square'
-			)}
-			src={pb.files.getUrl(song, song?.cover_art)}
-			alt={song.title}
-			{width}
-			{height}
-		/>
+		<a href="/song/{song.id}">
+			<img
+				class={cn(
+					'h-auto w-auto object-cover transition-all hover:scale-105',
+					aspectRatio === 'portrait' ? 'aspect-[3/4]' : 'aspect-square'
+				)}
+				src={pb.files.getUrl(song, song?.cover_art)}
+				alt={song.title}
+				{width}
+				{height}
+			/></a
+		>
 	</div>
 
 	<div class="space-y-1 text-sm">
-		<h3 class="font-medium leading-none">{song.title}</h3>
+		<a href="/song/{song.id}">
+			<h3 class="font-medium leading-none">{song.title}</h3>
+		</a>
 		<p class="text-xs text-muted-foreground">
 			{#each artistUsernames as username, i}
 				<a href="/user/{username}">{username}</a>{i < artistUsernames.length - 1 ? ' • ' : ''}
