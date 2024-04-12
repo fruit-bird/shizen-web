@@ -25,8 +25,8 @@
 				alt={song.title}
 				{width}
 				{height}
-			/></a
-		>
+			/>
+		</a>
 	</div>
 
 	<div class="space-y-1 text-sm">
