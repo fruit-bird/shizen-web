@@ -51,7 +51,7 @@
 			<a href="/user/{message.expand?.user?.username}">
 				<Avatar.Root class="mr-2 h-9 w-9">
 					<Avatar.Image
-						src={pb.files.getUrl(message.expand?.user, message.expand?.user?.avatar)}
+						src={pb.files.getUrl(message.expand?.user, message.expand?.user?.avatar, { thumb: '48x48' })}
 						alt={message.expand?.user?.username}
 					/>
 					<Avatar.Fallback>{message.expand?.user?.display_name[0]}</Avatar.Fallback>
