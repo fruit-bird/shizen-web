@@ -5,7 +5,7 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
-	import * as Avatar from '$lib/components/ui/avatar/index.js';
+	import * as Avatar from '$lib/components/ui/avatar';
 
 	let newMessage: string = '';
 	let messages: RecordModel[] = [];
@@ -48,10 +48,15 @@
 <ScrollArea class="fixed right-0 top-0 m-4 h-full w-[20%] rounded-md border p-4">
 	{#each messages as message (message.id)}
 		<div class="mb-4 flex items-start">
-			<Avatar.Root class="mr-2 h-9 w-9">
-				<Avatar.Image src={message.expand?.user?.avatar} alt="{message.expand?.user?.username}" />
-				<Avatar.Fallback>{message.expand?.user?.display_name[0]}</Avatar.Fallback>
-			</Avatar.Root>
+			<a href="/user/{message.expand?.user?.username}">
+				<Avatar.Root class="mr-2 h-9 w-9">
+					<Avatar.Image
+						src={pb.files.getUrl(message.expand?.user, message.expand?.user?.avatar)}
+						alt={message.expand?.user?.username}
+					/>
+					<Avatar.Fallback>{message.expand?.user?.display_name[0]}</Avatar.Fallback>
+				</Avatar.Root>
+			</a>
 			<div>
 				<a href="/user/{message.expand?.user?.username}">
 					<small>{message.expand?.user?.username}</small>
