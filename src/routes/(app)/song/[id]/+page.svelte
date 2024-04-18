@@ -28,7 +28,7 @@
 <div class="container mx-auto px-4 py-8">
 	<div class="flex">
 		<div class="w-1/4">
-			<img src={pb.files.getUrl(song, song?.cover_art)} alt={song?.title} />
+			<enhanced:img src={pb.files.getUrl(song, song?.cover_art)} alt={song?.title} />
 		</div>
 		<h1 class="mb-2 text-3xl font-bold">{song?.title}</h1>
 		<div class="w-3/4">
