@@ -7,6 +7,9 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Avatar from '$lib/components/ui/avatar';
 
+	let className: string | undefined | null = undefined;
+	export { className as class };
+
 	let newMessage: string = '';
 	let messages: RecordModel[] = [];
 	let unsubscribe: UnsubscribeFunc;
@@ -43,15 +46,44 @@
 	}
 
 	function scrollToBottom() {}
+
+	function formatAMPM(date: Date) {
+		const hours = date.getHours();
+		const minutes = date.getMinutes();
+		const amPM = hours >= 12 ? 'PM' : 'AM';
+		const formattedHours = hours % 12 || 12; // Convert 0 to 12
+		const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Ensure double digits for minutes
+		return `${formattedHours}:${formattedMinutes}${amPM}`;
+	}
+
+	function parseTime(dateString: string): string {
+		const date = new Date(dateString);
+		const now = new Date();
+		const diff = now.getTime() - date.getTime();
+		const day = 86_400_000; // 1000 * 60 * 60 * 24
+		const week = day * 7;
+
+		if (diff < day) {
+			return formatAMPM(date);
+		} else if (diff < day * 2) {
+			return `Yesterday, ${formatAMPM(date)}`;
+		} else if (diff < week) {
+			return `${date.toLocaleDateString([], { weekday: 'short' })}, ${formatAMPM(date)}`;
+		} else {
+			return date.toLocaleDateString([], { month: 'short', day: '2-digit' });
+		}
+	}
 </script>
 
-<ScrollArea class="fixed right-0 top-0 m-4 h-full w-[20%] rounded-md border p-4">
+<ScrollArea class={className}>
 	{#each messages as message (message.id)}
 		<div class="mb-4 flex items-start">
 			<a href="/user/{message.expand?.user?.username}">
 				<Avatar.Root class="mr-2 h-9 w-9">
 					<Avatar.Image
-						src={pb.files.getUrl(message.expand?.user, message.expand?.user?.avatar, { thumb: '48x48' })}
+						src={pb.files.getUrl(message.expand?.user, message.expand?.user?.avatar, {
+							thumb: '48x48'
+						})}
 						alt={message.expand?.user?.username}
 					/>
 					<Avatar.Fallback>{message.expand?.user?.display_name[0]}</Avatar.Fallback>
@@ -59,8 +91,9 @@
 			</a>
 			<div>
 				<a href="/user/{message.expand?.user?.username}">
-					<small>{message.expand?.user?.username}</small>
+					<small class="opacity-45">{message.expand?.user?.username}</small>
 				</a>
+				<small class="opacity-25">• {parseTime(message.created)}</small>
 				<p>{message.text}</p>
 			</div>
 		</div>
