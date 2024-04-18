@@ -1,8 +1,20 @@
 <script lang="ts">
-	import UserAuthForm from '$lib/components/auth2';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import { currentUser, pb } from '$lib/pocketbase';
+
+	let username: string = '';
+	let password: string = '';
+
+	// Redirect if user is already logged in
+	$: if ($currentUser) {
+		window.location.href = '/';
+	}
+
+	async function login() {
+		await pb.collection('users').authWithPassword(username, password);
+	}
 
 	let isLoading = false;
 	async function onSubmit() {
@@ -21,8 +33,13 @@
 		Sign Up
 	</Button>
 	<div class="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-		<div class="bg-image absolute inset-0 bg-cover" />
-		<div class="relative z-20 flex items-center text-lg font-medium">Shizen</div>
+		<div
+			class="absolute inset-0 bg-cover"
+			style={`background-image: url("/images/tunnel_vision.PNG");`}
+		/>
+		<div class="relative z-20 flex items-center text-lg font-medium">
+			<a href="/">Shizen</a>
+		</div>
 		<div class="relative z-20 mt-auto">
 			<blockquote class="space-y-2">
 				<p class="text-lg">
@@ -38,12 +55,10 @@
 		<div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
 			<div class="flex flex-col space-y-2 text-center">
 				<h1 class="text-2xl font-semibold tracking-tight">Welcome back!</h1>
-				<p class="text-sm text-muted-foreground">
-					Enter your username below to continue the conversation
-				</p>
+				<p class="text-sm text-muted-foreground">Login to continue the conversation</p>
 			</div>
 			<div class="grid gap-6">
-				<form on:submit|preventDefault={onSubmit}>
+				<form on:submit|preventDefault={login}>
 					<div class="grid gap-2">
 						<div class="grid gap-1">
 							<Label class="sr-only" for="username">Username</Label>
@@ -51,6 +66,7 @@
 								id="username"
 								placeholder="fruit.bird"
 								type="text"
+								bind:value={username}
 								autocapitalize="none"
 								autocomplete="username"
 								autocorrect="off"
@@ -63,6 +79,7 @@
 								id="password"
 								placeholder="••••••••"
 								type="password"
+								bind:value={password}
 								autocapitalize="none"
 								autocomplete="current-password"
 								autocorrect="off"
@@ -97,9 +114,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.bg-image {
-		background-image: url('https://images.unsplash.com/photo-1590069261209-f8e9b8642343?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1376&q=80');
-	}
-</style>

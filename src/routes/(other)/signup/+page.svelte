@@ -1,8 +1,39 @@
 <script lang="ts">
-	import UserAuthForm from '$lib/components/auth2';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import { currentUser, pb } from '$lib/pocketbase';
+
+	let username: string = '';
+	let email: string = '';
+	let password: string = '';
+
+	// Redirect if user is already logged in
+	$: if ($currentUser) {
+		window.location.href = '/';
+	}
+
+	async function login() {
+		await pb.collection('users').authWithPassword(username, password);
+	}
+
+	async function signUp() {
+		try {
+			const data = {
+				username,
+				email,
+				emailVisibility: false,
+				password,
+				passwordConfirm: password,
+				name: username
+			};
+
+			const createdUser = await pb.collection('users').create(data);
+			await login();
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
 	let isLoading = false;
 	async function onSubmit() {
@@ -21,8 +52,15 @@
 		Login
 	</Button>
 	<div class="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-		<div class="bg-image absolute inset-0 bg-cover" />
-		<div class="relative z-20 flex items-center text-lg font-medium">Shizen</div>
+		<div
+			class="absolute inset-0 bg-cover"
+			style={`background-image: url("/images/tunnel_vision.PNG");`}
+		/>
+		<div class="relative z-20 flex items-center text-lg font-medium">
+			<div class="relative z-20 flex items-center text-lg font-medium">
+				<a href="/">Shizen</a>
+			</div>
+		</div>
 		<div class="relative z-20 mt-auto">
 			<blockquote class="space-y-2">
 				<p class="text-lg">
@@ -41,7 +79,7 @@
 				<p class="text-sm text-muted-foreground">Enter your email below to create your account</p>
 			</div>
 			<div class="grid gap-6">
-				<form on:submit|preventDefault={onSubmit}>
+				<form on:submit|preventDefault={signUp}>
 					<div class="grid gap-2">
 						<div class="grid gap-1">
 							<Label class="sr-only" for="username">Username</Label>
@@ -49,6 +87,7 @@
 								id="username"
 								placeholder="fruit.bird"
 								type="text"
+								bind:value={username}
 								autocapitalize="none"
 								autocomplete="username"
 								autocorrect="off"
@@ -61,6 +100,7 @@
 								id="email"
 								placeholder="fruit.bird@shizen.com"
 								type="email"
+								bind:value={email}
 								autocapitalize="none"
 								autocomplete="email"
 								autocorrect="off"
@@ -73,6 +113,7 @@
 								id="password"
 								placeholder="••••••••"
 								type="password"
+								bind:value={password}
 								autocapitalize="none"
 								autocomplete="current-password"
 								autocorrect="off"
@@ -106,7 +147,7 @@
 			</div>
 
 			<p class="px-8 text-center text-sm text-muted-foreground">
-				By clicking continue, you agree to our
+				By signing up, you agree to our
 				<a href="/terms" class="underline underline-offset-4 hover:text-primary">
 					Terms of Service
 				</a>
@@ -118,9 +159,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.bg-image {
-		background-image: url('https://images.unsplash.com/photo-1590069261209-f8e9b8642343?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1376&q=80');
-	}
-</style>

@@ -3,4 +3,3 @@
 </script>
 
 <h1>Shizen</h1>
-<AuthDispatcher />
