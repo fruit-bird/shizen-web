@@ -2,28 +2,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { currentUser, pb } from '$lib/pocketbase';
 
-	let username: string = '';
-	let password: string = '';
-
-	// Redirect if user is already logged in
-	$: if ($currentUser) {
-		window.location.href = '/';
-	}
-
-	async function login() {
-		await pb.collection('users').authWithPassword(username, password);
-	}
-
-	let isLoading = false;
-	async function onSubmit() {
-		isLoading = true;
-
-		setTimeout(() => {
-			isLoading = false;
-		}, 3000);
-	}
+	export let form;
 </script>
 
 <div
@@ -38,7 +18,9 @@
 			style={`background-image: url("/images/tunnel_vision.PNG");`}
 		/>
 		<div class="relative z-20 flex items-center text-lg font-medium">
-			<a href="/">Shizen</a>
+			<div class="relative z-20 flex items-center text-lg font-medium">
+				<a href="/">Shizen</a>
+			</div>
 		</div>
 		<div class="relative z-20 mt-auto">
 			<blockquote class="space-y-2">
@@ -58,58 +40,41 @@
 				<p class="text-sm text-muted-foreground">Login to continue the conversation</p>
 			</div>
 			<div class="grid gap-6">
-				<form on:submit|preventDefault={login}>
+				<form action="?/login" method="post">
 					<div class="grid gap-2">
 						<div class="grid gap-1">
 							<Label class="sr-only" for="username">Username</Label>
 							<Input
 								id="username"
+								name="username"
 								placeholder="fruit.bird"
 								type="text"
-								bind:value={username}
 								autocapitalize="none"
 								autocomplete="username"
 								autocorrect="off"
-								disabled={isLoading}
 							/>
 						</div>
 						<div class="grid gap-1">
 							<Label class="sr-only" for="password">Password</Label>
 							<Input
 								id="password"
+								name="password"
 								placeholder="••••••••"
 								type="password"
-								bind:value={password}
 								autocapitalize="none"
 								autocomplete="current-password"
 								autocorrect="off"
-								disabled={isLoading}
 							/>
 						</div>
-						<Button type="submit" disabled={isLoading}>
-							{#if isLoading}
-								<!-- <Icons.spinner class="mr-2 h-4 w-4 animate-spin" /> -->
-							{/if}
-							Login
-						</Button>
+						<Button type="submit">Login to your Account</Button>
+						<!-- {#if form?.notVerified}
+							<div class="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+								<strong class="font-bold">You must verify your account before you can login</strong>
+								<span class="block sm:inline">{form.notVerified}</span>
+							</div>
+						{/if} -->
 					</div>
 				</form>
-				<div class="relative">
-					<div class="absolute inset-0 flex items-center">
-						<span class="w-full border-t" />
-					</div>
-					<div class="relative flex justify-center text-xs uppercase">
-						<span class="bg-background px-2 text-muted-foreground"> Or continue with </span>
-					</div>
-				</div>
-				<Button variant="outline" type="button" disabled={isLoading}>
-					{#if isLoading}
-						<!-- <Icons.spinner class="mr-2 h-4 w-4 animate-spin" /> -->
-					{:else}
-						<!-- <Icons.gitHub class="mr-2 h-4 w-4" /> -->
-					{/if}
-					Google
-				</Button>
 			</div>
 		</div>
 	</div>

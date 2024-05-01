@@ -2,47 +2,6 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { currentUser, pb } from '$lib/pocketbase';
-
-	let username: string = '';
-	let email: string = '';
-	let password: string = '';
-
-	// Redirect if user is already logged in
-	$: if ($currentUser) {
-		window.location.href = '/';
-	}
-
-	async function login() {
-		await pb.collection('users').authWithPassword(username, password);
-	}
-
-	async function signUp() {
-		try {
-			const data = {
-				username,
-				email,
-				emailVisibility: false,
-				password,
-				passwordConfirm: password,
-				name: username
-			};
-
-			const createdUser = await pb.collection('users').create(data);
-			await login();
-		} catch (err) {
-			console.error(err);
-		}
-	}
-
-	let isLoading = false;
-	async function onSubmit() {
-		isLoading = true;
-
-		setTimeout(() => {
-			isLoading = false;
-		}, 3000);
-	}
 </script>
 
 <div
@@ -79,71 +38,64 @@
 				<p class="text-sm text-muted-foreground">Enter your email below to create your account</p>
 			</div>
 			<div class="grid gap-6">
-				<form on:submit|preventDefault={signUp}>
+				<form action="?/register" method="post">
 					<div class="grid gap-2">
 						<div class="grid gap-1">
 							<Label class="sr-only" for="username">Username</Label>
 							<Input
 								id="username"
+								name="username"
 								placeholder="fruit.bird"
 								type="text"
-								bind:value={username}
 								autocapitalize="none"
 								autocomplete="username"
 								autocorrect="off"
-								disabled={isLoading}
 							/>
 						</div>
 						<div class="grid gap-1">
 							<Label class="sr-only" for="email">Email</Label>
 							<Input
 								id="email"
+								name="email"
 								placeholder="fruit.bird@shizen.com"
 								type="email"
-								bind:value={email}
 								autocapitalize="none"
 								autocomplete="email"
 								autocorrect="off"
-								disabled={isLoading}
 							/>
 						</div>
 						<div class="grid gap-1">
 							<Label class="sr-only" for="password">Password</Label>
 							<Input
 								id="password"
+								name="password"
 								placeholder="••••••••"
 								type="password"
-								bind:value={password}
 								autocapitalize="none"
-								autocomplete="current-password"
+								autocomplete="new-password"
 								autocorrect="off"
-								disabled={isLoading}
 							/>
 						</div>
-						<Button type="submit" disabled={isLoading}>
-							{#if isLoading}
-								<!-- <Icons.spinner class="mr-2 h-4 w-4 animate-spin" /> -->
-							{/if}
-							Sign Up with Email
-						</Button>
+						<div class="grid gap-1">
+							<Label class="sr-only" for="passwordConfirm">Password</Label>
+							<Input
+								id="passwordConfirm"
+								name="passwordConfirm"
+								placeholder="••••••••"
+								type="password"
+								autocapitalize="none"
+								autocomplete="new-password"
+								autocorrect="off"
+							/>
+						</div>
+						<Button type="submit">Sign Up with Email</Button>
 					</div>
 				</form>
 				<div class="relative">
 					<div class="absolute inset-0 flex items-center">
 						<span class="w-full border-t" />
 					</div>
-					<div class="relative flex justify-center text-xs uppercase">
-						<span class="bg-background px-2 text-muted-foreground"> Or continue with </span>
-					</div>
 				</div>
-				<Button variant="outline" type="button" disabled={isLoading}>
-					{#if isLoading}
-						<!-- <Icons.spinner class="mr-2 h-4 w-4 animate-spin" /> -->
-					{:else}
-						<!-- <Icons.gitHub class="mr-2 h-4 w-4" /> -->
-					{/if}
-					Google
-				</Button>
 			</div>
 
 			<p class="px-8 text-center text-sm text-muted-foreground">
