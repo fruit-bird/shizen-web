@@ -17,19 +17,19 @@ export const actions: Actions = {
         const body = Object.fromEntries(await request.formData());
 
         try {
-            const validatedForm = signupSchema.parse(body);
+            const validatedFormData = signupSchema.parse(body);
             const usernameTaken = await locals.pb
                 .collection('users')
-                .getFirstListItem(`username="${validatedForm.username}"`)
+                .getFirstListItem(`username="${validatedFormData.username}"`)
                 .catch(() => undefined);
 
             if (!usernameTaken) {
                 await locals.pb.collection('users').create({
-                    ...validatedForm,
-                    name: validatedForm.username as string,
+                    ...validatedFormData,
+                    name: validatedFormData.username as string,
                     emailVisibility: false
                 });
-                await locals.pb.collection('users').requestVerification(validatedForm.email as string);
+                await locals.pb.collection('users').requestVerification(validatedFormData.email as string);
             }
         } catch (err) {
             console.log('Error', err);
