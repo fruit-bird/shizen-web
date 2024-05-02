@@ -1,8 +1,15 @@
 import { error, redirect, type Actions } from "@sveltejs/kit";
+import z from 'zod';
+
+const loginSchema = z.object({
+    username: z.string(),
+    password: z.string().min(8),
+});
 
 export const actions: Actions = {
     login: async ({ locals, request }) => {
-        const { username, password } = Object.fromEntries(await request.formData());
+        const body = Object.fromEntries(await request.formData());
+        const { username, password } = loginSchema.parse(body);
 
         try {
             await locals.pb.collection('users').authWithPassword(username as string, password as string);
