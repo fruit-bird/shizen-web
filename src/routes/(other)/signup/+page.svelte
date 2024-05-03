@@ -2,6 +2,11 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import { superForm } from 'sveltekit-superforms';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+	const { form, errors, constraints, enhance } = superForm(data.form);
 </script>
 
 <div
@@ -38,55 +43,83 @@
 				<p class="text-sm text-muted-foreground">Enter your email below to create your account</p>
 			</div>
 			<div class="grid gap-6">
-				<form action="?/register" method="post">
+				<form action="?/register" method="post" use:enhance>
 					<div class="grid gap-2">
 						<div class="grid gap-1">
 							<Label class="sr-only" for="username">Username</Label>
 							<Input
 								id="username"
 								name="username"
-								placeholder="fruit.bird"
+								bind:value={$form.username}
+								{...$constraints.username}
 								type="text"
-								autocapitalize="none"
+								aria-invalid={$errors.username ? 'true' : undefined}
+								class={$errors.username ? 'border-red-500' : ''}
+								placeholder="fruit.bird"
 								autocomplete="username"
-								autocorrect="off"
 							/>
+							{#if $errors.username}
+								{#each $errors.username as error}
+									<small class="text-red-500">{error}</small>
+								{/each}
+							{/if}
 						</div>
 						<div class="grid gap-1">
 							<Label class="sr-only" for="email">Email</Label>
 							<Input
 								id="email"
 								name="email"
-								placeholder="fruit.bird@shizen.com"
+								bind:value={$form.email}
+								{...$constraints.email}
 								type="email"
-								autocapitalize="none"
+								aria-invalid={$errors.email ? 'true' : undefined}
+								class={$errors.email ? 'border-red-500' : ''}
+								placeholder="fruit.bird@shizen.com"
 								autocomplete="email"
-								autocorrect="off"
 							/>
+							{#if $errors.email}
+								{#each $errors.email as error}
+									<small class="text-red-500">{error}</small>
+								{/each}
+							{/if}
 						</div>
 						<div class="grid gap-1">
 							<Label class="sr-only" for="password">Password</Label>
 							<Input
 								id="password"
 								name="password"
-								placeholder="••••••••"
+								bind:value={$form.password}
+								{...$constraints.password}
 								type="password"
-								autocapitalize="none"
+								aria-invalid={$errors.password ? 'true' : undefined}
+								class={$errors.password ? 'border-red-500' : ''}
+								placeholder="••••••••"
 								autocomplete="new-password"
-								autocorrect="off"
 							/>
+							{#if $errors.password}
+								{#each $errors.password as error}
+									<small class="text-red-500">{error}</small>
+								{/each}
+							{/if}
 						</div>
 						<div class="grid gap-1">
 							<Label class="sr-only" for="passwordConfirm">Password</Label>
 							<Input
 								id="passwordConfirm"
 								name="passwordConfirm"
-								placeholder="••••••••"
+								bind:value={$form.passwordConfirm}
+								{...$constraints.passwordConfirm}
 								type="password"
-								autocapitalize="none"
+								aria-invalid={$errors.passwordConfirm ? 'true' : undefined}
+								class={$errors.passwordConfirm ? 'border-red-500' : ''}
+								placeholder="••••••••"
 								autocomplete="new-password"
-								autocorrect="off"
 							/>
+							{#if $errors.passwordConfirm}
+								{#each $errors.passwordConfirm as error}
+									<small class="text-red-500">{error}</small>
+								{/each}
+							{/if}
 						</div>
 						<Button type="submit">Sign Up with Email</Button>
 					</div>

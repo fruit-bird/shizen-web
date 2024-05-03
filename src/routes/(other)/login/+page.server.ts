@@ -1,26 +1,34 @@
-import { error, redirect, type Actions } from "@sveltejs/kit";
+import { redirect, type Actions } from "@sveltejs/kit";
+import { fail, superValidate } from "sveltekit-superforms";
+import { zod } from "sveltekit-superforms/adapters";
 import z from 'zod';
 
 const loginSchema = z.object({
-    username: z.string(),
-    password: z.string().min(8),
+    username: z.string({ required_error: 'Username is required' }).trim(),
+    password: z.string({ required_error: 'Password is required' }),
 });
 
+export const load = async () => {
+    return { form: await superValidate(zod(loginSchema)) };
+}
+
 export const actions: Actions = {
-    login: async ({ locals, request }) => {
-        const body = Object.fromEntries(await request.formData());
-        const { username, password } = loginSchema.parse(body);
+    login: async (event) => {
+        if (event.locals.pb.authStore.isValid) {
+            throw redirect(303, '/');
+        }
+
+        const form = await superValidate(event, zod(loginSchema));
+        if (!form.valid) {
+            return fail(400, { form });
+        }
 
         try {
-            await locals.pb.collection('users').authWithPassword(username as string, password as string);
-            // if (!locals.pb?.authStore?.model?.verified) {
-            //     locals.pb.authStore.clear();
-            //     return { notVerified: true };
-            // }
+            await event.locals.pb.collection('users').authWithPassword(form.data.username, form.data.password);
         } catch (err) {
-            console.log('Login Error', err);
-            throw error(500, 'Something went wrong');
+            return fail(400, { form });
         }
+
         throw redirect(303, '/');
     }
 };
