@@ -1,34 +1,17 @@
 <script lang="ts">
-	import type { RecordModel } from 'pocketbase';
-	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
-	import { pb } from '$lib/pocketbase';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import * as Avatar from '$lib/components/ui/avatar';
+	import { getImageURL } from '$lib/utils';
 
-	let song: RecordModel;
-	let artists: RecordModel[] = [];
-	let comments: RecordModel[] = [];
-
-	onMount(async () => {
-		song = await pb.collection('songs').getOne($page.params.id, { expand: 'artists' });
-		artists = song.expand?.artists;
-		comments = await pb
-			.collection('song_comments')
-			.getList(1, 20, {
-				filter: `song="${song.id}"`,
-				sort: '-created',
-				expand: 'user'
-			})
-			.then((resultsList) => resultsList.items);
-	});
+	export let data;
+	const { song, artists, comments } = data;
 </script>
 
 <div class="container mx-auto px-4 py-8">
 	<div class="flex">
 		<div class="w-1/4">
-			<enhanced:img src={pb.files.getUrl(song, song?.cover_art)} alt={song?.title} />
+			<img src={getImageURL(song?.collectionId!, song?.id!, song?.coverArt)} alt={song?.title} />
 		</div>
 		<h1 class="mb-2 text-3xl font-bold">{song?.title}</h1>
 		<div class="w-3/4">
@@ -42,8 +25,7 @@
 				<p class="text-xs text-muted-foreground">{song?.created.slice(0, 4)}</p>
 			</div>
 			<p>{song?.description}</p>
-
-			<div><p>{song?.num_plays} plays</p></div>
+			<div><p>{song?.numPlays} plays</p></div>
 		</div>
 	</div>
 
@@ -60,15 +42,20 @@
 	<!-- so that i can do recursive rendering of replies -->
 	<div class="mb-4">
 		<div class="mb-2 flex">
-			{#each comments as comment}
+			{#each comments! as comment}
 				<div class="mr-2 flex-shrink-0">
 					<a href="/user/{comment.expand?.user?.username}" class="font-semibold">
 						<Avatar.Root class="h-8 w-8">
 							<Avatar.Image
-								src={pb.files.getUrl(comment.expand?.user, comment.expand?.user?.avatar, { thumb: '48x48' })}
+								src={getImageURL(
+									comment.expand?.user?.collectionId,
+									comment.expand?.user?.id,
+									comment.expand?.user?.avatar,
+									'48x48'
+								)}
 								alt={comment.expand?.user?.username}
 							/>
-							<Avatar.Fallback>{comment.expand?.user?.display_name[0]}</Avatar.Fallback>
+							<Avatar.Fallback>{comment.expand?.user?.displayName[0]}</Avatar.Fallback>
 						</Avatar.Root>
 					</a>
 				</div>
