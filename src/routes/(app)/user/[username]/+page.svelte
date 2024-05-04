@@ -1,42 +1,29 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { currentUser, pb } from '$lib/pocketbase';
-	import type { RecordModel } from 'pocketbase';
-	import { page } from '$app/stores';
-
-	import PlusCircled from 'svelte-radix/PlusCircled.svelte';
+	import { PlusCircle } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import SongCard from '$lib/components/SongCard.svelte';
+	import { getImageURL } from '$lib/utils';
 
-	let user: RecordModel;
-	let songs: RecordModel[] = [];
-
-	onMount(async () => {
-		user = await pb.collection('users').getFirstListItem(`username="${$page.params.username}"`);
-		songs = await pb
-			.collection('songs')
-			.getList(1, 20, {
-				filter: `artists.username?="${$page.params.username}"`,
-				sort: '-created',
-				expand: 'artists'
-			})
-			.then((resultsList) => resultsList.items);
-	});
+	export let data;
+	const { artist, songs, user: currentUser } = data;
 </script>
 
 <div class="m-4 flex items-center">
 	<div class="mr-4 flex-none">
 		<Avatar.Root class="h-24 w-24">
-			<Avatar.Image src={pb.files.getUrl(user, user?.avatar)} alt={user?.username} />
-			<Avatar.Fallback>{user?.display_name[0]}</Avatar.Fallback>
+			<Avatar.Image
+				src={getImageURL(artist?.collectionId!, artist?.id!, artist?.avatar)}
+				alt={artist?.username}
+			/>
+			<Avatar.Fallback>{artist?.displayName[0]}</Avatar.Fallback>
 		</Avatar.Root>
 	</div>
 	<div>
-		<h1 class="text-3xl font-semibold">{user?.display_name}</h1>
-		<p class="text-muted-foreground">{user?.tag_line}</p>
+		<h1 class="text-3xl font-semibold">{artist?.displayName}</h1>
+		<p class="text-muted-foreground">{artist?.motto}</p>
 	</div>
 </div>
 
@@ -55,14 +42,14 @@
 											Most recent uploads for your enjoyment
 										</p>
 									</div>
-									{#if user?.id === $currentUser?.id}
+									{#if artist?.id === currentUser?.id}
 										<Button
 											href="/upload"
 											color="primary"
 											size="sm"
 											class="space-between flex items-center"
 										>
-											<PlusCircled class="h-4 w-4" />
+											<PlusCircle class="h-4 w-4" />
 											<span class="ml-2">Upload Music</span>
 										</Button>
 									{/if}
@@ -71,7 +58,7 @@
 								<div class="relative">
 									<ScrollArea orientation="horizontal">
 										<div class="flex space-x-4 pb-4">
-											{#each songs as song}
+											{#each songs! as song}
 												<SongCard {song} />
 											{/each}
 										</div>
