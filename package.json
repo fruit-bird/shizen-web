@@ -45,6 +45,7 @@
     "@tabler/icons-svelte": "^3.1.0",
     "bits-ui": "^0.21.7",
     "clsx": "^2.1.0",
+    "cmdk-sv": "^0.0.17",
     "formsnap": "^1.0.0",
     "lucide-svelte": "^0.365.0",
     "mode-watcher": "^0.3.0",
