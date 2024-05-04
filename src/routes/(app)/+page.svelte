@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AuthDispatcher from '$lib/AuthDispatcher.svelte';
+	export let data;
 </script>
 
-<h1>Shizen</h1>
+<p>User: {data.user?.username || 'not authentified'}</p>
