@@ -2,7 +2,6 @@ import { fail } from '@sveltejs/kit';
 
 export const load = async ({ params, locals }) => {
     const { username } = params;
-
     try {
         const artist = await locals.pb.collection('users').getFirstListItem(`username="${username}"`);
         const songs = await locals.pb
