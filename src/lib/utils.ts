@@ -7,6 +7,10 @@ export const serializeNonPOJOs = (obj: any) => {
 	return structuredClone(obj);
 };
 
+export const getImageURL = (collectionId: string, recordId: string, fileName: string, thumb = '0x0') => {
+	return `http://localhost:8090/api/files/${collectionId}/${recordId}/${fileName}?thumb=${thumb}`;
+}
+
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
