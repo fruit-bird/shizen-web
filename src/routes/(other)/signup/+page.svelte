@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
 	import { superForm } from 'sveltekit-superforms';
+	import SuperDebug from 'sveltekit-superforms';
+	import * as Form from '$lib/components/ui/form';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	const { form, errors, constraints, enhance } = superForm(data.form);
+	const form = superForm(data.form);
+	const { form: formData, enhance	 } = form;
 </script>
 
 <div
@@ -43,86 +45,57 @@
 				<p class="text-sm text-muted-foreground">Enter your email below to create your account</p>
 			</div>
 			<div class="grid gap-6">
-				<form action="?/register" method="post" use:enhance>
-					<div class="grid gap-2">
-						<div class="grid gap-1">
-							<Label class="sr-only" for="username">Username</Label>
+				<form method="post" use:enhance>
+					<Form.Field {form} name="username">
+						<Form.Control let:attrs>
+							<Form.Label>Username</Form.Label>
 							<Input
-								id="username"
-								name="username"
-								bind:value={$form.username}
-								{...$constraints.username}
-								type="text"
-								aria-invalid={$errors.username ? 'true' : undefined}
-								class={$errors.username ? 'border-red-500' : ''}
+								bind:value={$formData.username}
+								{...attrs}
+								type="username"
 								placeholder="fruit.bird"
-								autocomplete="username"
 							/>
-							{#if $errors.username}
-								{#each $errors.username as error}
-									<small class="text-red-500">{error}</small>
-								{/each}
-							{/if}
-						</div>
-						<div class="grid gap-1">
-							<Label class="sr-only" for="email">Email</Label>
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name="email">
+						<Form.Control let:attrs>
+							<Form.Label>Email</Form.Label>
 							<Input
-								id="email"
-								name="email"
-								bind:value={$form.email}
-								{...$constraints.email}
+								bind:value={$formData.email}
+								{...attrs}
 								type="email"
-								aria-invalid={$errors.email ? 'true' : undefined}
-								class={$errors.email ? 'border-red-500' : ''}
 								placeholder="fruit.bird@shizen.com"
-								autocomplete="email"
 							/>
-							{#if $errors.email}
-								{#each $errors.email as error}
-									<small class="text-red-500">{error}</small>
-								{/each}
-							{/if}
-						</div>
-						<div class="grid gap-1">
-							<Label class="sr-only" for="password">Password</Label>
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name="password">
+						<Form.Control let:attrs>
+							<Form.Label>Password</Form.Label>
 							<Input
-								id="password"
-								name="password"
-								bind:value={$form.password}
-								{...$constraints.password}
+								bind:value={$formData.password}
+								{...attrs}
 								type="password"
-								aria-invalid={$errors.password ? 'true' : undefined}
-								class={$errors.password ? 'border-red-500' : ''}
 								placeholder="••••••••"
-								autocomplete="new-password"
 							/>
-							{#if $errors.password}
-								{#each $errors.password as error}
-									<small class="text-red-500">{error}</small>
-								{/each}
-							{/if}
-						</div>
-						<div class="grid gap-1">
-							<Label class="sr-only" for="passwordConfirm">Password</Label>
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name="passwordConfirm">
+						<Form.Control let:attrs>
+							<Form.Label>Confirm Password</Form.Label>
 							<Input
-								id="passwordConfirm"
-								name="passwordConfirm"
-								bind:value={$form.passwordConfirm}
-								{...$constraints.passwordConfirm}
+								bind:value={$formData.passwordConfirm}
+								{...attrs}
 								type="password"
-								aria-invalid={$errors.passwordConfirm ? 'true' : undefined}
-								class={$errors.passwordConfirm ? 'border-red-500' : ''}
 								placeholder="••••••••"
-								autocomplete="new-password"
 							/>
-							{#if $errors.passwordConfirm}
-								{#each $errors.passwordConfirm as error}
-									<small class="text-red-500">{error}</small>
-								{/each}
-							{/if}
-						</div>
-						<Button type="submit">Sign Up with Email</Button>
-					</div>
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+
+					<Form.Button class="w-full">Sign up</Form.Button>
 				</form>
 				<div class="relative">
 					<div class="absolute inset-0 flex items-center">
@@ -141,6 +114,8 @@
 					Privacy Policy
 				</a>
 			</p>
+
+			<SuperDebug data={$formData} />
 		</div>
 	</div>
 </div>

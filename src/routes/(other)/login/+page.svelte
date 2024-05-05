@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
 	import { superForm } from 'sveltekit-superforms';
+	import SuperDebug from 'sveltekit-superforms';
+	import * as Form from '$lib/components/ui/form';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	const { form, errors, constraints, enhance } = superForm(data.form);
+	const form = superForm(data.form);
+	const { form: formData, enhance } = form;
 </script>
 
 <div
@@ -43,55 +45,37 @@
 				<p class="text-sm text-muted-foreground">Login to continue the conversation</p>
 			</div>
 			<div class="grid gap-6">
-				<form action="?/login" method="post" use:enhance>
-					<div class="grid gap-2">
-						<div class="grid gap-1">
-							<Label class="sr-only" for="username">Username</Label>
+				<form method="post" use:enhance>
+					<Form.Field {form} name="username">
+						<Form.Control let:attrs>
+							<Form.Label>Username</Form.Label>
 							<Input
-								id="username"
-								name="username"
-								bind:value={$form.username}
-								{...$constraints.username}
-								type="text"
-								aria-invalid={$errors.username ? 'true' : undefined}
-								class={$errors.username ? 'border-red-500' : ''}
+								bind:value={$formData.username}
+								{...attrs}
+								type="username"
 								placeholder="fruit.bird"
-								autocomplete="username"
 							/>
-							{#if $errors.username}
-								{#each $errors.username as error}
-									<small class="text-red-500">{error}</small>
-								{/each}
-							{/if}
-						</div>
-						<div class="grid gap-1">
-							<Label class="sr-only" for="password">Password</Label>
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+
+					<Form.Field {form} name="password">
+						<Form.Control let:attrs>
+							<Form.Label>Password</Form.Label>
 							<Input
-								id="password"
-								name="password"
-								bind:value={$form.password}
-								{...$constraints.password}
+								bind:value={$formData.password}
+								{...attrs}
 								type="password"
-								aria-invalid={$errors.password ? 'true' : undefined}
-								class={$errors.password ? 'border-red-500' : ''}
 								placeholder="••••••••"
-								autocomplete="current-password"
 							/>
-							{#if $errors.password}
-								{#each $errors.password as error}
-									<small class="text-red-500">{error}</small>
-								{/each}
-							{/if}
-						</div>
-						<Button type="submit">Login to your Account</Button>
-						<!-- {#if form?.notVerified}
-							<div class="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-								<strong class="font-bold">You must verify your account before you can login</strong>
-								<span class="block sm:inline">{form.notVerified}</span>
-							</div>
-						{/if} -->
-					</div>
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+
+					<Form.Button class="w-full">Login</Form.Button>
 				</form>
+
+				<SuperDebug data={$formData} />
 			</div>
 		</div>
 	</div>

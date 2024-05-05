@@ -36,27 +36,28 @@ const signupSchema = z.object({
     }
 });
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+    if (locals.pb.authStore.isValid) {
+        throw redirect(303, '/');
+    }
     return { form: await superValidate(zod(signupSchema)) };
 };
 
 export const actions: Actions = {
-    register: async (event) => {
-        // if (event.locals.pb.authStore.isValid) {
-        //     throw redirect(303, '/');
-        // }
+    default: async (event) => {
         const form = await superValidate(event, zod(signupSchema));
         const usernameTaken = await event.locals.pb.collection('users').getFirstListItem(`username="${form.data.username}"`).catch(() => undefined);
         if (usernameTaken) {
             return setError(form, 'username', 'Username already exists');
         }
+        // should check for email taken, normal check does not work, idk why
 
         if (!form.valid) {
             return fail(400, { form });
         }
 
         try {
-            await event.locals.pb.collection('users').create({ ...form.data, name: form.data.username, emailVisibility: false });
+            await event.locals.pb.collection('users').create({ ...form.data, displayName: form.data.username, emailVisibility: false });
             // await event.locals.pb.collection('users').requestVerification(form.data.email);
             await event.locals.pb.collection('users').authWithPassword(form.data.email, form.data.password);
         } catch (err) {
