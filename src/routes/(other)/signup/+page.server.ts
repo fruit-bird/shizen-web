@@ -9,11 +9,11 @@ const signupSchema = z.object({
         .string({ required_error: 'Username is required' })
         .trim()
         .min(1, { message: 'Username is required' })
-        .max(20, { message: 'Username is too long' }),
+        .max(40, { message: 'Username is too long' }),
     email: z
         .string({ required_error: 'Email is required' })
         .min(1, { message: 'Email is required' })
-        .max(20, { message: 'Email is too long' })
+        .max(200, { message: 'Email is too long' })
         .email({ message: 'Invalid email' }),
     password: z
         .string({ required_error: 'Password is required' })
@@ -58,7 +58,7 @@ export const actions: Actions = {
 
         try {
             await event.locals.pb.collection('users').create({ ...form.data, displayName: form.data.username, emailVisibility: false });
-            // await event.locals.pb.collection('users').requestVerification(form.data.email);
+            await event.locals.pb.collection('users').requestVerification(form.data.email);
             await event.locals.pb.collection('users').authWithPassword(form.data.email, form.data.password);
         } catch (err) {
             return fail(500, { form });
