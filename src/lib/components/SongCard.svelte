@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { cn } from '$lib/utils.js';
+	import { cn, getImageURL } from '$lib/utils';
 	import type { RecordModel } from 'pocketbase';
-	import { pb } from '$lib/pocketbase';
 
-	let className: string | undefined | null = 'w-[250px]';
+	let className: string | undefined = 'w-[250px]';
+	export { className as class };
 	export let aspectRatio: 'portrait' | 'square' = 'square';
 	export let width = 250;
 	export let height = 330;
-	export { className as class };
 	export let song: RecordModel;
 
 	let artistUsernames = song.expand?.artists.map((artist: RecordModel) => artist.username);
@@ -21,7 +20,7 @@
 					'h-auto w-auto object-cover transition-all hover:scale-105',
 					aspectRatio === 'portrait' ? 'aspect-[3/4]' : 'aspect-square'
 				)}
-				src={pb.files.getUrl(song, song?.coverArt)}
+				src={getImageURL(song.collectionId, song.id, song.coverArt)}
 				alt={song.title}
 				{width}
 				{height}
