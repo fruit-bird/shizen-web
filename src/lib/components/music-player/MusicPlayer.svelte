@@ -27,9 +27,8 @@
 			.catch(() => undefined);
 		like = await pb
 			.collection('song_likes')
-			.getFirstListItem(`user=${$user?.id} && song=${song?.id}`)
+			.getFirstListItem(`user="${$user?.id}" && song="${song?.id}"`)
 			.catch(() => undefined);
-
 		liked = !!like;
 
 		if (song) {
@@ -62,7 +61,14 @@
 		audio.volume = volume;
 	}
 
+	// unliking and liking again will lead to a new like id, so we need to fetch the like again
 	async function toggleLike() {
+		like = await pb
+			.collection('song_likes')
+			.getFirstListItem(`user="${$user?.id}" && song="${song?.id}"`)
+			.catch(() => undefined);
+		liked = !!like;
+
 		if (liked) {
 			await pb.collection('song_likes').delete(like?.id!);
 			liked = false;
