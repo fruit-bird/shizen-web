@@ -18,7 +18,8 @@
 	let duration: number;
 	let currentTime: number;
 	let paused = true;
-	let volume = 0.7;
+	let sliderValue: number[] = [70];
+	$: volume = sliderValue[0] / 100;
 
 	onMount(async () => {
 		song = await pb
@@ -56,12 +57,6 @@
 		}
 	}
 
-	function changeVolume(event: CustomEvent<HTMLInputElement>) {
-		volume = Number(event.detail.value) / 100;
-		audio.volume = volume;
-	}
-
-	// unliking and liking again will lead to a new like id, so we need to fetch the like again
 	async function toggleLike() {
 		like = await pb
 			.collection('song_likes')
@@ -149,6 +144,6 @@
 		<Button size="icon" variant="ghost">
 			<FastForward class="h-5 w-5" />
 		</Button>
-		<Slider value={[volume]} max={100} step={5} on:input={changeVolume} />
+		<Slider bind:value={sliderValue} max={100} step={1} />
 	</div>
 </div>
