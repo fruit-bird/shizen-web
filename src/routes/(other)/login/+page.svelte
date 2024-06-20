@@ -75,7 +75,7 @@
 					<Form.Button class="w-full">Login</Form.Button>
 				</form>
 
-				<SuperDebug data={$formData} />
+				<!-- <SuperDebug data={$formData} /> -->
 			</div>
 		</div>
 	</div>
