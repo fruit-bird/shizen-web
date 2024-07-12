@@ -48,7 +48,7 @@
 
 	<div class="mb-8">
 		<h2 class="mb-4 text-2xl font-semibold">Comments</h2>
-		<form class="mb-6">
+		<form class="mb-6 w-[50%]">
 			<div class="flex">
 				<Input type="text" placeholder="Add a comment..." class="flex-grow rounded-r-none" />
 				<Button type="submit" class="rounded-l-none">Post</Button>
