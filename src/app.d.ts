@@ -10,7 +10,6 @@ declare global {
 		interface Locals {
 			pb: PocketBase;
 			user: AuthModel | undefined;
-			currentSongId: string;
 		}
 		// interface PageData {}
 		// interface PageState {}

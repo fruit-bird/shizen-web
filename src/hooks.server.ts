@@ -8,7 +8,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     if (event.locals.pb.authStore.isValid) {
         event.locals.user = serializeNonPOJOs(event.locals.pb.authStore.model);
-        event.locals.currentSongId = event.locals.pb.authStore.model?.currentSongId || 'ipyn2jk7018e447';
     } else {
         event.locals.user = undefined;
     }
