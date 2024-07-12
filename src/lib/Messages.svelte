@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { currentUser, pb } from '$lib/pocketbase';
-	import type { RecordModel, UnsubscribeFunc } from 'pocketbase';
+	import { pb } from '$lib/pocketbase';
+	import type { AuthModel, RecordModel, UnsubscribeFunc } from 'pocketbase';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import * as Avatar from '$lib/components/ui/avatar';
+	import { getImageURL } from '$lib/utils';
 
 	let className: string | undefined | null = undefined;
 	export { className as class };
+	export let user: AuthModel | null = null;
 
 	let newMessage: string = '';
 	let messages: RecordModel[] = [];
@@ -21,7 +23,6 @@
 		});
 		messages = resultList.items.reverse();
 
-		// This is a subscription to realtime messages
 		unsubscribe = await pb.collection('messages').subscribe('*', async ({ action, record }) => {
 			if (action === 'create') {
 				const user = await pb.collection('users').getOne(record.user);
@@ -39,13 +40,16 @@
 	});
 
 	async function sendMessage() {
-		const data = { text: newMessage, user: $currentUser?.id };
-		const createdMessage = await pb.collection('messages').create(data);
-		newMessage = ''; // Clear the input field
-		scrollToBottom();
-	}
+		const data = { text: newMessage, user: user?.id };
+		console.log('Message Data', data);
 
-	function scrollToBottom() {}
+		try {
+			await pb.collection('messages').create(data);
+			newMessage = '';
+		} catch (err) {
+			console.error('Error sending message', err);
+		}
+	}
 
 	function formatAMPM(date: Date) {
 		const hours = date.getHours();
@@ -75,32 +79,34 @@
 	}
 </script>
 
-<ScrollArea class={className}>
-	{#each messages as message (message.id)}
-		<div class="mb-4 flex items-start">
-			<a href="/user/{message.expand?.user?.username}">
-				<Avatar.Root class="mr-2 h-9 w-9">
-					<Avatar.Image
-						src={pb.files.getUrl(message.expand?.user, message.expand?.user?.avatar, {
-							thumb: '48x48'
-						})}
-						alt={message.expand?.user?.username}
-					/>
-					<Avatar.Fallback>{message.expand?.user?.display_name[0]}</Avatar.Fallback>
-				</Avatar.Root>
-			</a>
-			<div>
-				<a href="/user/{message.expand?.user?.username}">
-					<small class="opacity-45">{message.expand?.user?.username}</small>
+<div class={`flex flex-col ${className}`}>
+	<ScrollArea class="flex-grow overflow-auto pr-2">
+		{#each messages as message (message.id)}
+			{@const commenter = message.expand?.user as RecordModel}
+			<div class="mb-4 flex items-start">
+				<a href="/user/{commenter?.username}">
+					<Avatar.Root class="mr-2 h-9 w-9">
+						<Avatar.Image
+							src={getImageURL(commenter?.collectionId, commenter?.id, commenter?.avatar, '48x48')}
+							alt={commenter?.username}
+						/>
+						<Avatar.Fallback>{commenter?.displayName[0]}</Avatar.Fallback>
+					</Avatar.Root>
 				</a>
-				<small class="opacity-25">• {parseTime(message.created)}</small>
-				<p>{message.text}</p>
+				<div>
+					<a href="/user/{commenter?.username}">
+						<small class="opacity-45">{commenter?.username}</small>
+					</a>
+					<small class="opacity-25">• {parseTime(message.created)}</small>
+					<p>{message.text}</p>
+				</div>
 			</div>
-		</div>
-	{/each}
-
-	<form on:submit|preventDefault={sendMessage} class="flex w-full max-w-sm items-center space-x-2">
-		<Input type="text" placeholder="Message" bind:value={newMessage} />
-		<Button type="submit">Send</Button>
-	</form>
-</ScrollArea>
+		{/each}
+	</ScrollArea>
+	<div class="mt-2">
+		<form on:submit|preventDefault={sendMessage} class="flex items-center space-x-2">
+			<Input bind:value={newMessage} type="text" placeholder="Message" class="flex-grow" />
+			<Button type="submit">Send</Button>
+		</form>
+	</div>
+</div>

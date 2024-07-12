@@ -1,66 +1,65 @@
+<!-- src/lib/components/AudioPlayer.svelte -->
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import { onMount, onDestroy } from 'svelte';
+	import { audioStore } from '$lib/stores/audioStore';
 	import { Slider } from '$lib/components/ui/slider';
-	import { pb, user } from '$lib/pocketbase';
-	import { getImageURL } from '$lib/utils';
-	import { Pause, Play, FastForward, Rewind, Heart } from 'lucide-svelte';
-	import type { RecordModel } from 'pocketbase';
-	import { onMount } from 'svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { Play, Pause, SkipBack, SkipForward, Volume2, Heart } from 'lucide-svelte';
+	import type { AuthModel, RecordModel } from 'pocketbase';
+	import { pb } from '$lib/pocketbase';
 
-	export let songId: string;
+	export let user: AuthModel | undefined;
 
-	let song: RecordModel | undefined = undefined;
+	let audio: HTMLAudioElement;
+	let progress = 0;
+	let volume = 1;
+	let duration = 0;
+
 	let like: RecordModel | undefined = undefined;
 	let liked: boolean = false;
+	let artists: RecordModel[] = [];
 
-	let src: string | undefined = undefined;
-	let audio: HTMLAudioElement;
-	let duration: number;
-	let currentTime: number;
-	let paused = true;
-	let sliderValue: number[] = [70];
-	$: volume = sliderValue[0] / 100;
-
+	$: console.log('audioStore', $audioStore);
 	onMount(async () => {
-		song = await pb
-			.collection('songs')
-			.getOne(songId, { expand: 'artists' })
-			.catch(() => undefined);
 		like = await pb
 			.collection('song_likes')
-			.getFirstListItem(`user="${$user?.id}" && song="${song?.id}"`)
+			.getFirstListItem(`user="${user?.id}" && song="${$audioStore.currentSongId}"`)
 			.catch(() => undefined);
 		liked = !!like;
 
-		if (song) {
-			try {
-				src = pb.files.getUrl(song, song.audioFile);
-			} catch (err) {
-				console.error('Error getting song data', err);
-			}
-		}
+		audio = new Audio();
+		audio.addEventListener('timeupdate', updateProgress);
+		audio.addEventListener('loadedmetadata', () => {
+			duration = audio.duration;
+		});
 	});
 
-	function formatTime(time: number) {
-		const minutes = Math.floor(time / 60);
-		const seconds = Math.floor(time % 60);
-		return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+	function updateProgress() {
+		progress = (audio.currentTime / audio.duration) * 100 || 0;
 	}
 
-	function togglePlayPause() {
-		if (paused) {
-			audio?.play();
-			paused = false;
-		} else {
-			audio?.pause();
-			paused = true;
+	function handleProgressChange(event: CustomEvent) {
+		const newProgress = event.detail[0];
+		audio.currentTime = (newProgress / 100) * audio.duration;
+	}
+
+	function handleVolumeChange(event: CustomEvent) {
+		volume = event.detail[0] / 100;
+		if (audio) {
+			audio.volume = volume;
 		}
+	}
+
+	function formatTime(seconds: number) {
+		const mins = Math.floor(seconds / 60);
+		const secs = Math.floor(seconds % 60);
+		return `${mins}:${secs.toString().padStart(2, '0')}`;
 	}
 
 	async function toggleLike() {
 		like = await pb
 			.collection('song_likes')
-			.getFirstListItem(`user="${$user?.id}" && song="${song?.id}"`)
+			.getFirstListItem(`user="${user?.id}" && song="${$audioStore.currentSongId}"`)
 			.catch(() => undefined);
 		liked = !!like;
 
@@ -68,82 +67,120 @@
 			await pb.collection('song_likes').delete(like?.id!);
 			liked = false;
 		} else {
-			await pb.collection('song_likes').create({ user: $user?.id, song: song?.id });
+			await pb.collection('song_likes').create({ user: user?.id, song: $audioStore.currentSongId });
 			liked = true;
 		}
 	}
+
+	async function getSongInfo() {
+		like = await pb
+			.collection('song_likes')
+			.getFirstListItem(`user="${user?.id}" && song="${$audioStore.currentSongId}"`)
+			.catch(() => undefined);
+		liked = !!like;
+
+		for (const artistId of $audioStore.songData!.artists) {
+			const artist = await pb.collection('users').getOne(artistId);
+			artists.push(artist);
+		}
+	}
+
+	$: if ($audioStore.songData) {
+		if (!audio) {
+			audio = new Audio($audioStore.songData.audioUrl);
+		} else {
+			audio.src = $audioStore.songData.audioUrl;
+		}
+		if ($audioStore.isPlaying) {
+			audio.play();
+		}
+	}
+
+	$: if (audio && !$audioStore.isPlaying) {
+		audio.pause();
+	}
 </script>
 
-<!-- <div class="player outline-double fixed bottom-0 left-0 right-0 p-4 border-t border-gray-200" class:paused>
-	<div class="info">
-		<div class="time">
-			<span>{formatTime(time)}</span>
-			<div class="slider" on:pointerdown={seek}>
-				<div class="progress" style="--progress: {time / duration}%" />
-			</div>
-			<span>{duration ? formatTime(duration) : '--:--'}</span>
-		</div>
-	</div>
-</div> -->
-
 <div class="fixed bottom-0 left-0 right-0 flex items-center gap-4 px-4 py-2">
-	<audio bind:this={audio} {src} bind:duration bind:paused bind:volume bind:currentTime />
-	<div class="flex-shrink-0">
-		<a href={`/song/${song?.id}`}>
-			<img
-				src={getImageURL(song?.collectionId!, song?.id!, song?.coverArt, '48x48')}
-				alt="Song Cover Art"
-				class="aspect-square rounded-md object-cover"
-				height={50}
-				width={50}
-			/>
-		</a>
-	</div>
-	<div class="flex-1 overflow-hidden">
-		<a class="truncate text-base font-semibold hover:underline" href={`/song/${song?.id}`}>
-			{song?.title}
-		</a>
-		<div class="text-muted-foreground">
-			{#if song?.expand?.artists}
-				{@const artists = song?.expand?.artists}
-				{#each artists as artist, i}
-					<a class="truncate" href={`/user/${artist.username}`}>
-						<small>{artist.username}</small>
-					</a>
-					{i < artists.length - 1 ? ' • ' : ''}
-				{/each}
-			{/if}
+	{#if $audioStore.songData}
+		<div class="flex-shrink-0">
+			<a href={`/song/${$audioStore.currentSongId}`}>
+				<img
+					src={$audioStore.songData.coverArt}
+					alt="Cover Art"
+					class="h-14 w-14 rounded object-cover"
+				/>
+			</a>
 		</div>
-	</div>
+		<div class="flex-1 overflow-hidden">
+			<a
+				class="truncate text-base font-semibold hover:underline"
+				href={`/song/${$audioStore.currentSongId}`}
+			>
+				{$audioStore.songData.title}
+			</a>
+			<div class="text-muted-foreground">
+				{#if $audioStore.songData.artists}
+					{@const artists = $audioStore.songData.artists}
+					{#each artists as artist, i}
+						<a class="truncate" href={`/user/${artist.username}`}>
+							<small>{artist.username}</small>
+						</a>
+						{i < artists.length - 1 ? ' • ' : ''}
+					{/each}
+				{/if}
+			</div>
+		</div>
 
-	<!-- <div class="flex items-center gap-4">
-		<span class="text-sm">{formatTime(currentTime)}</span>
-		<Slider value={[currentTime]} max={duration} step={1} />
-		<span class="text-sm">{formatTime(duration)}</span>
-	</div> -->
+		<div class="flex w-1/2 items-center gap-x-3 space-x-2">
+			<span class="text-sm">{formatTime(audio?.currentTime || 0)}</span>
+			<Slider
+				value={[progress]}
+				on:change={handleProgressChange}
+				max={100}
+				step={0.1}
+				class="w-full"
+			/>
+			<span class="text-sm">{formatTime(duration)}</span>
+		</div>
 
-	<Button variant="ghost" size="icon" on:click={toggleLike}>
-		{#if liked}
-			<Heart class="h-5 w-5 text-red-500" />
-		{:else}
-			<Heart class="h-5 w-5" />
-		{/if}
-	</Button>
-
-	<div class="flex items-center gap-4">
-		<Button size="icon" variant="ghost">
-			<Rewind class="h-5 w-5" />
-		</Button>
-		<Button variant="ghost" size="icon" on:click={togglePlayPause}>
-			{#if paused}
-				<Play class="h-5 w-5" />
+		<Button variant="ghost" size="icon" on:click={toggleLike}>
+			{#if liked}
+				<Heart class="h-5 w-5 text-red-500" />
 			{:else}
-				<Pause class="h-5 w-5" />
+				<Heart class="h-5 w-5" />
 			{/if}
 		</Button>
-		<Button size="icon" variant="ghost">
-			<FastForward class="h-5 w-5" />
-		</Button>
-		<Slider bind:value={sliderValue} max={100} step={1} />
-	</div>
+
+		<div class="flex items-center gap-3">
+			<Button variant="ghost" size="icon">
+				<SkipBack class="h-5 w-5" />
+			</Button>
+			{#if $audioStore.isPlaying}
+				<Button variant="ghost" size="icon" on:click={() => audioStore.pauseSong()}>
+					<Pause class="h-5 w-5" />
+				</Button>
+			{:else}
+				<Button variant="ghost" size="icon" on:click={() => audioStore.resumeSong()}>
+					<Play class="h-5 w-5" />
+				</Button>
+			{/if}
+			<Button variant="ghost" size="icon">
+				<SkipForward class="h-5 w-5" />
+			</Button>
+		</div>
+
+		<div class="flex w-1/12 items-center justify-end space-x-2">
+			<Volume2 class="h-5 w-5" />
+			<Slider
+				value={[volume * 100]}
+				on:change={handleVolumeChange}
+				max={100}
+				step={1}
+				class="w-24"
+			/>
+		</div>
+	{:else}
+		<p class="w-full text-center">No song selected</p>
+	{/if}
 </div>
