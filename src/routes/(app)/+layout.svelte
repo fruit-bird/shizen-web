@@ -5,9 +5,7 @@
 	import MusicPlayer from '$lib/components/music-player/MusicPlayer.svelte';
 	import { NavBar } from '$lib/components/nav';
 
-	export let data;
-
-	const { currentSongId } = data;
+	export let data;	
 	const navItems = [
 		{ title: 'Social', href: '/' },
 		{ title: 'Explore', href: '/explore' },
@@ -16,21 +14,19 @@
 	];
 </script>
 
-<div>
+<div class="flex min-h-screen flex-col">
 	<ModeWatcher />
 	<header class="fixed top-0 z-10 w-full">
 		<NavBar user={data.user} {navItems} />
 	</header>
-
-	<main class="container mx-auto mt-16 flex">
-		<div>
-			<slot class="fixed inset-0 overflow-auto" />
+	<main class="mt-16 flex flex-grow">
+		<div class="flex-grow overflow-auto">
+			<slot />
 		</div>
-		<div class="fixed right-0 top-0 h-full w-[20%] overflow-auto">
-			<!-- <Messages class="h-full rounded-md border p-3" /> -->
+		<div class="fixed bottom-16 right-0 top-20 w-[20%] overflow-hidden">
+			<Messages class="h-full rounded-md border p-3" user={data.user} />
 		</div>
 	</main>
-	<MusicPlayer songId={currentSongId} />
-
+	<MusicPlayer user={data.user} />
 	<footer></footer>
 </div>
