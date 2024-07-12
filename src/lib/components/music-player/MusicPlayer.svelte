@@ -79,10 +79,10 @@
 			.catch(() => undefined);
 		liked = !!like;
 
-		for (const artistId of $audioStore.songData!.artists) {
-			const artist = await pb.collection('users').getOne(artistId);
-			artists.push(artist);
-		}
+		// for (const artistId of $audioStore.songData!.artists) {
+		// 	const artist = await pb.collection('users').getOne(artistId);
+		// 	artists.push(artist);
+		// }
 	}
 
 	$: if ($audioStore.songData) {
