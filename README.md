@@ -1,38 +1,22 @@
-# create-svelte
+# SHIZEN - Collaborative Music Platform
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+![](images/user_profile.jpg)
 
-## Creating a project
+Think SoundCloud meets Discord. The most overlooked factor in the music industry is the power of networking. **SHIZEN** will provide a platform for artists to connect with other artists, share their music, and collaborate on projects.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
+- **User Profiles**: Customize your profile to showcase your music and connect with other artists.
+- **Live Chat**: Real-time chat on the homepage for instant community interaction
+- **Music Sharing**: Upload and share music with descriptions and cover art
+- **Music Player**: Integrated music player with streaming, queueing, and playback controls
+- **Trending Page**: Discover popular songs with category filtering
+- **Personalized Homepage**: View posts from followed artists
+- **Search Functionality**: Find songs, users, artist clubs, or tags
+- **Artist Clubs**: Subscription-based exclusive content for fans
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## Tech Stack
+- Frontend: SvelteKit + TypeScript
+- Backend: Pocketbase (Go)
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## What is This?
+I wanted to learn SvelteKit, and decided to build a full-stack web application to do so. I love making music. This project is a work-in-progress, and I will be updating it as I continue to learn (and have time!!)
