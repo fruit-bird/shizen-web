@@ -8,7 +8,6 @@
 
 	let className: string | undefined = 'w-[250px]';
 	export { className as class };
-	export let currentSongId: string;
 	export let aspectRatio: 'portrait' | 'square' = 'square';
 	export let width = 250;
 	export let height = 330;
@@ -27,10 +26,7 @@
 	// 		console.error('Failed to add to queue', error);
 	// 	}
 	// }
-	async function addToQueue() {
-		// currentSongId.set(song.id);
-		currentSongId = song.id;
-	}
+	async function addToQueue() {}
 
 	function playSong() {
 		audioStore.playSong(song.id);
