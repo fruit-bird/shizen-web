@@ -42,7 +42,6 @@
   "type": "module",
   "dependencies": {
     "@sveltejs/enhanced-img": "^0.2.0",
-    "@tabler/icons-svelte": "^3.1.0",
     "bits-ui": "^0.21.7",
     "clsx": "^2.1.0",
     "cmdk-sv": "^0.0.17",
